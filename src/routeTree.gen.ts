@@ -18,6 +18,7 @@ import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedOrganizerRouteImport } from './routes/_authenticated/organizer'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedOrganizerScanRouteImport } from './routes/_authenticated/organizer.scan'
 
 const EventsRoute = EventsRouteImport.update({
   id: '/events',
@@ -63,26 +64,34 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOrganizerScanRoute =
+  AuthenticatedOrganizerScanRouteImport.update({
+    id: '/scan',
+    path: '/scan',
+    getParentRoute: () => AuthenticatedOrganizerRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/events': typeof EventsRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/organizer': typeof AuthenticatedOrganizerRoute
+  '/organizer': typeof AuthenticatedOrganizerRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/events/$id': typeof EventsIdRoute
+  '/organizer/scan': typeof AuthenticatedOrganizerScanRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/events': typeof EventsRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/organizer': typeof AuthenticatedOrganizerRoute
+  '/organizer': typeof AuthenticatedOrganizerRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/events/$id': typeof EventsIdRoute
+  '/organizer/scan': typeof AuthenticatedOrganizerScanRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -91,10 +100,11 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/events': typeof EventsRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/organizer': typeof AuthenticatedOrganizerRoute
+  '/_authenticated/organizer': typeof AuthenticatedOrganizerRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/events/$id': typeof EventsIdRoute
+  '/_authenticated/organizer/scan': typeof AuthenticatedOrganizerScanRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/tickets'
     | '/events/$id'
+    | '/organizer/scan'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/tickets'
     | '/events/$id'
+    | '/organizer/scan'
   id:
     | '__root__'
     | '/'
@@ -128,6 +140,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/tickets'
     | '/events/$id'
+    | '/_authenticated/organizer/scan'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -202,19 +215,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/organizer/scan': {
+      id: '/_authenticated/organizer/scan'
+      path: '/scan'
+      fullPath: '/organizer/scan'
+      preLoaderRoute: typeof AuthenticatedOrganizerScanRouteImport
+      parentRoute: typeof AuthenticatedOrganizerRoute
+    }
   }
 }
 
+interface AuthenticatedOrganizerRouteChildren {
+  AuthenticatedOrganizerScanRoute: typeof AuthenticatedOrganizerScanRoute
+}
+
+const AuthenticatedOrganizerRouteChildren: AuthenticatedOrganizerRouteChildren =
+  {
+    AuthenticatedOrganizerScanRoute: AuthenticatedOrganizerScanRoute,
+  }
+
+const AuthenticatedOrganizerRouteWithChildren =
+  AuthenticatedOrganizerRoute._addFileChildren(
+    AuthenticatedOrganizerRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedOrganizerRoute: typeof AuthenticatedOrganizerRoute
+  AuthenticatedOrganizerRoute: typeof AuthenticatedOrganizerRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedOrganizerRoute: AuthenticatedOrganizerRoute,
+  AuthenticatedOrganizerRoute: AuthenticatedOrganizerRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
 }
